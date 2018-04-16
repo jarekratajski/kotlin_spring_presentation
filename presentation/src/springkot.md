@@ -17,6 +17,15 @@ Java developer (since 1999) with a functional  heart.
 ## Project
 
 
+### Disclaimer
+
+Small, good and motivated team can work efficiently with any framework and methodology.
+
+Including Scrum. 
+
+
+### Printing
+
 ![machine](/src/img/printmachine.jpeg)
 
 
@@ -30,7 +39,7 @@ Java developer (since 1999) with a functional  heart.
 - various customers (various steps)
 
 
-## Non functional
+### Non functional
 
 - memory consumption
 - failures/ retrials (conversions)
@@ -39,9 +48,11 @@ Java developer (since 1999) with a functional  heart.
 - basic management 
 
 
-## Reactive streams 
+### Reactive streams 
 
 ![flux](/src/img/reactivestream.png)
+
+Scala, Akka-streams....
 
 
 
@@ -50,91 +61,215 @@ Java developer (since 1999) with a functional  heart.
 Reality
 
 
+## This is Java (EE)
 
-# This is Java (EE)
+
+![Reality](/src/img/javaee.jpg)
 
 We have JBoss, Spring, everywhere....
 
 
-## Blocking architecture
+### Blocking architecture
 
 - 1 request  - 1 thread
 - Aspects (Security, Transactions)
 - (AKA) Runtime magic
 
 
-## Scalability ??
+### Transaction
+```{java}
+@Transactional
+    ... User setGroupOwner(String userName, String groupName) {
+        final User user = userRepository.findByName(userName);
+        final Group group = groupRepository.findByName(groupName);
+        user.setGroup(group);
+        group.setOwner(user);
+        return user;
+    }
+```   
 
 
-## Magic ??
+### What could possibly go wrong?
+
+- method private
+- this.method self call 
+- bean created by new
+- called in other thread
+- @Transactional annotation class not deployed
+- Evil aspect deployed
 
 
-## Sad story
+### Sad story
 
 No serious business should use frameworks that relies on *runtime magic*.
 
 
-## yet it works...
+### yet it works...
+
+![fear](/src/img/fear.jpg)
+
+
+- **UNIX** after **Multics** 196x
+- **Linux** ... 199x
+- **C++** after **C** 198x
+- **Java** after **C++** 199x
+ 
+
+
+![steps](/src/img/baby_steps.jpg)
 
 
 
-# Step 0
-Reactive
 
-
-## Reactive streams
-
-- retry() 
-- cache()
-- hot sequences()
-- zip()
-- merge()
-
-(add example from code)
-
-
-# Step 1
+## Step 1
 Spring 5
 
 
+### Most popular Java/Enterprise framework now
+![steps](/src/img/spring.png)
+
+
+### Spring 2.x
+
+![steps](/src/img/xml.jpg)
+
+
+### Spring 2.x
+
+![steps](/src/img/xml.jpg)
+
+
+### Spring 4.x
+
+```{java}
+@SuppressWarnings({"unchecked", "rawtypes"})
+@Deprecated
+@OneToMany(@HowManyDBADoYouNeedToChangeALightBulb)
+@OneToManyMore @AnyOne @AnyBody
+@YouDoNotTalkAboutOneToMany // Fightclub, LOL
+@TweakThisWithThat(
+    tweak = {
+        @TweakID(name = "id", preferredValue = 1839),
+        @TweakID(name = "test", preferredValue = 839),
+        @TweakID(name = "test.old", preferredValue = 34),
+    },
+    inCaseOf = {
+        @ConditionalXMLFiltering(run = 5),
+    }
+)
+@ManyToMany @Many @AnnotationsTotallyRock @DeclarativeProgrammingRules @NoMoreExplicitAlgorithms
+@Fetch @FetchMany @FetchWithDiscriminator(name = "no_name")
+@SeveralAndThenNothing @MaybeThisDoesSomething
+@JoinTable(joinColumns = {
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+})
+@DoesThisEvenMeanAnything @DoesAnyoneEvenReadThis
+@PrefetchJoinWithDiscriminator @JustTrollingYouKnow @LOL
+@IfJoiningAvoidHashJoins @ButUseHashJoinsWhenMoreThan(records = 1000)
+@XmlDataTransformable @SpringPrefechAdapter
+private Collection employees;
+```
+
+Copyright annotationmania.com - Lukas Eder
+
+
+### Spring 5.x
+
+Fact 1 : All that crazy stuff (spring 4.x) still works :-(
+
+
+### Spring 5.x
+
+Fact 2 : But there is alternative
+
+Spring Web Flux
+
+
 ## Spring WebFlux
+
 Fully *functional* web framework
+
 Similar to Akka-HTTP or NodeJS/Express or Ratpack/Java
 
 
-(put code example)
+```{java}
+RouterFunction prepareRouterFunction() {
+        return nest( path("/api"),
+                    route(GET("/time"), renderTime())
+                    .andRoute(GET("/messages/{topic}"), renderMessages())
+                    .andRoute(POST("/messages/{topic}"), postMessage()));
+}
+
+```
+
+```{java}
+private HandlerFunction<ServerResponse> renderTime() {
+        return request -> {
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter myFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+            return ServerResponse.ok()
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(fromObject(myFormatter.format(now)));
+        };
+    }
+
+```
+
+No more servlets.
 
 
-##  Ugly parts (of Spring) support
-??
+No more magic annotations.
 
 
-# :-)
+# Projectreactor
+
+
+WebFlux uses projectreactor streams.
+
+
+```Mono<T>```
+
+
+```Flux<T>```
+
+
+### :-)
 
 Spring 5 WebFlux has almost nothing in common with classic Spring.
 
+
 Spring 5 still support *magic and annotations* but we can completely avoid that parts.   
+
+
+Unless someone will accidentally use spring-data or other part :-( 
 
 
 
 ## Java
 
-WebFlux works great with Java
+WebFlux works OK with Java
 
 
-## Functional programming with Java
+We can now create *pure* java server applications.
 
-Supported. 
 
-We have such things as:
+### Functional programming with Java
+
+
+Works
+
+
+Among language structures  for  fp in Java we have:
+
 
 Lambdas
 
 
-...
+.
 
 
-...
+..
 
 
 ...
@@ -154,15 +289,31 @@ Lambdas
 
 OK. Seems we only have lambdas.
 
-# Functional language
+
+
+## Step 2 
+
+Introduce language with better FP support.
+
 
 Scala
 
-# Scala problem 
 
-- Bad PR
+### Scala problem 
 
-# Step 2 
+
+complex
+
+
+prejudices
+
+
+*implicits*
+
+
+
+## Step 2 
+
 Kotlin
 
 
@@ -203,8 +354,11 @@ public class Document {
 
 ```
 
-No we dont write like that in Java anymore.
 
+No, we dont write like that in Java anymore.
+
+
+Java
 
 ```{java}
 public class Document implements Serializable {
@@ -259,18 +413,23 @@ public class Document implements Serializable {
 ```
 
 
+Kotlin
+
 ```{kotlin}
 data class Document( val id : Int, val path String, val type : Long)
-
-// using 
-val newDoc = oldDoc.copy( path = 'aaa bb c');
 ```
 
 
-## Data classes !
+Usage of data classes
+
+```
+val newDoc = oldDoc.copy( path = 'aaa bb c');
+```
+
+### Data classes !
 
 
-## val 
+### val 
 
 ```{kotlin}
 val x = 5
@@ -282,17 +441,39 @@ val y = x + 1
 ```
 
 
-## if
+## if expression
 
 ```{kotlin}
 val x = if ( y >=0) y else -y  
 ```
 
+
+## Basic pattern matching
+
+```{kotlin}
+fun main(args : Array<String>) {
+    val x : Any = 7
+    when(x) {
+        in 1..10 -> print("in range")
+        is String -> print("I guess it's not even a number")
+    }
+}
+```
+
+
+## functions / lambdas
+
+```{kotlin}
+val a = { i: Int -> i + 1 }
+
+val x:(Int) -> Int = {it + 1}
+```
+
+
 ## null safety
 
 ```{kotlin}
 data class Document( val id : Int, val path: String?, val type : Long)
-
 
 fun fun1() {
     val doc1 = Document(7, null, 4)
@@ -304,9 +485,8 @@ fun fun1() {
 }
 ```
 
-But is it better than Optional/Option
 
-operators
+Is it better than Optional/Option ?
 
 
 ## Kotlin supports immutability  / expressions
@@ -317,14 +497,57 @@ operators
 Seamless java integration (both directions)
 
 
+Java developer can understand and use Kotlin syntax after short introduction
+
+
+*15 minutes  and 30 seconds*
+
+
+
+
 ##  Or Scala--
+
 
 No implicits
 
+
 No  macros
 
-No type projections (#), 
-simple type system
+
+No type projections (#) 
+
+
+Simple type system
+
+
+Global type aliases
+
+
+No *for comprehensions*
+
+
+As Scala developer you understand kotlin in 5 minutes
+
+
+It annoys you every couple of minutes
+
+
+It looks like Scala, but it is not Scala
+  
+
+## Kotlin success
+
+
+Great IDE support (IntelliJ).
+
+
+Google Android - official language (2017)
+
+
+Spring(Pivotal) - officially supported language (2017)
+
+
+
 
 
 Problems in frameworks:
