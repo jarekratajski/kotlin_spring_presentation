@@ -21,7 +21,7 @@ Java developer (since 1999) with a functional  heart.
 
 Small, good and motivated team can work efficiently with any framework and methodology.
 
-Including Scrum. 
+Including Scrum<!-- .element: class="fragment" -->
 
 
 ### Printing
@@ -52,7 +52,7 @@ Including Scrum.
 
 ![flux](/src/img/reactivestream.png)
 
-Scala, Akka-streams....
+Scala, Akka-streams....<!-- .element: class="fragment" -->
 
 
 
@@ -61,12 +61,12 @@ Scala, Akka-streams....
 Reality
 
 
-## This is Java (EE)
+## Enterprise
 
 
 ![Reality](/src/img/javaee.jpg)
 
-We have JBoss, Spring, everywhere....
+We have JBoss, Websphere, Spring, everywhere....
 
 
 ### Blocking architecture
@@ -91,28 +91,28 @@ We have JBoss, Spring, everywhere....
 
 ### What could possibly go wrong?
 
-- method private
-- this.method self call 
-- bean created by new
-- called in other thread
-- @Transactional annotation class not deployed
-- Evil aspect deployed
+- method private<!-- .element: class="fragment" -->
+- this.method self call<!-- .element: class="fragment" --> 
+- bean created by new<!-- .element: class="fragment" -->
+- called in other thread<!-- .element: class="fragment" -->
+- @Transactional annotation class not deployed<!-- .element: class="fragment" -->
+- Evil aspect deployed<!-- .element: class="fragment" -->
 
 
 ### Sad story
 
-No serious business should use frameworks that relies on *runtime magic*.
+No serious business should use frameworks that rely on *runtime magic*
 
 
 ### yet it works...
 
+
 ![fear](/src/img/fear.jpg)
 
 
-- **UNIX** after **Multics** 196x
-- **Linux** ... 199x
-- **C++** after **C** 198x
-- **Java** after **C++** 199x
+- 198x **C++** after **C**
+- 199x **Java** after **C++**
+- 196x **UNIX** after **Multics**
  
 
 
@@ -127,11 +127,6 @@ Spring 5
 
 ### Most popular Java/Enterprise framework now
 ![steps](/src/img/spring.png)
-
-
-### Spring 2.x
-
-![steps](/src/img/xml.jpg)
 
 
 ### Spring 2.x
@@ -216,16 +211,19 @@ private HandlerFunction<ServerResponse> renderTime() {
 
 ```
 
-No more servlets.
+No more servlets
 
 
-No more magic annotations.
+No more magic annotations
 
 
 # Projectreactor
 
 
-WebFlux uses projectreactor streams.
+**projectreactor** = yet another reactive streams implementation
+
+
+WebFlux uses projectreactor streams
 
 
 ```Mono<T>```
@@ -234,12 +232,15 @@ WebFlux uses projectreactor streams.
 ```Flux<T>```
 
 
-### :-)
-
-Spring 5 WebFlux has almost nothing in common with classic Spring.
+### The truth :-)
 
 
-Spring 5 still support *magic and annotations* but we can completely avoid that parts.   
+Spring 5 WebFlux has almost nothing in common with classic Spring
+
+
+Spring 5 still support *magic and annotations*
+  
+yuo can avoid that parts   
 
 
 Unless someone will accidentally use spring-data or other part :-( 
@@ -251,7 +252,7 @@ Unless someone will accidentally use spring-data or other part :-(
 WebFlux works OK with Java
 
 
-We can now create *pure* java server applications.
+You can now create *pure* java server applications
 
 
 ### Functional programming with Java
@@ -291,9 +292,7 @@ OK. Seems we only have lambdas.
 
 
 
-## Step 2 
-
-Introduce language with better FP support.
+language with better FP support???
 
 
 Scala
@@ -310,6 +309,7 @@ prejudices
 
 *implicits*
 
+:-)
 
 
 ## Step 2 
@@ -355,7 +355,7 @@ public class Document {
 ```
 
 
-No, we dont write like that in Java anymore.
+No, we don't write JavaBeans anymore.
 
 
 Java
@@ -411,6 +411,7 @@ public class Document implements Serializable {
 }
 
 ```
+<!-- .element: class="stretch" -->
 
 
 Kotlin
@@ -426,8 +427,6 @@ Usage of data classes
 val newDoc = oldDoc.copy( path = 'aaa bb c');
 ```
 
-### Data classes !
-
 
 ### val 
 
@@ -436,7 +435,7 @@ val x = 5
 
 val y = x + 1
 
-//will never work
+//will not work
 //x = 7 
 ```
 
@@ -489,7 +488,22 @@ fun fun1() {
 Is it better than Optional/Option ?
 
 
+Kotlin has own immutable List (and mutable)
+
+Decided to use VAVR (+ kotlin wrapper)<!-- .element: class="fragment" -->
+
+Maybe we should have used Kotlin Lists?<!-- .element: class="fragment" -->
+
+
+# Kotlin  frameworks/ libs
+
+There is even functional server designed for kotlin (ktor)
+(but we keep using Spring 5) 
+
+
 ## Kotlin supports immutability  / expressions
+
+A lot better than Java
 
 
 ## Java++
@@ -532,13 +546,24 @@ As Scala developer you understand kotlin in 5 minutes
 It annoys you every couple of minutes
 
 
+For
+
+
+There is no for
+
+There are flatMaps
+
+
+No typeclasses(*)
+
+
 It looks like Scala, but it is not Scala
-  
+
 
 ## Kotlin success
 
 
-Great IDE support (IntelliJ).
+Great IDE support (IntelliJ)
 
 
 Google Android - official language (2017)
@@ -548,12 +573,121 @@ Spring(Pivotal) - officially supported language (2017)
 
 
 
+## Adoption
 
 
-Problems in frameworks:
-JavaEE  Spring Domination
-Blocking/ Request per Thread
-Runtime aspects
+```{kotlin}
+fun processFiles(): Flux<ProcessStatus> = 
+         inputFolder.getInputFiles()
+                .flatMap(inputFolder::getFile)
+                .parallel()
+                .doOnNext{ notifyFileScanned(it)}
+                .runOn(Schedulers.parallel())
+                .flatMap(config.getExtractor()::extract)
+                .doOnNext{ notifyExtracted(it)}
+                .flatMap(config.getNormalization()::normalize)
+                .sequential(8)
+                .groupBy(config.getDispatcher()::dispatch)
+                .flatMap(this::merge)
+                .doOnNext{ notifyMerged(it)}
+                .flatMap {
+                    val res = ProcessStatus.MergeStep(it)
+                    if ( it is MergeStatus.Finished) {
+                        Flux.just(res, ProcessStatus.OutputCreated(it.output))
+                    } else {
+                        res.toMono()
+                    }
+                }
 
-Scala - bad PR 
-Vavr vs Kotlin
+```
+
+
+Indifference - accepted
+
+
+Scepticism - object oriented gurus
+
+
+Enthusiasms !!!
+
+
+## JavaEE deployment?
+
+
+We still can easily deploy code as JavaEE war
+
+
+We drop functional routers and create classic Spring Rest controller on annotations
+
+
+Ugly but works
+
+
+
+## We have competition
+
+
+### Lombok
+
+
+Enterprise answer for Java weaknesses
+
+
+We will create a new language, but we  pretend we don`t do that
+
+
+```{java}
+@lombok.Getter
+@lombok.Setter
+@lombok.RequiredArgsConstructor
+@lombok.EqualsAndHashCode(of = {"number", "text"})
+@lombok.ToString(exclude = "strList")
+public class EveryThing {
+    private boolean flag;
+    private final int number;
+    private final String text;
+    private List<String> strList;
+ 
+    public List<String> getStrList() {
+        if (strList == null) {
+            strList = new ArrayList<>(128);
+        }
+        return Collections.unmodifiableList(strList);
+    }
+}
+
+```
+
+
+## Kotlin vs Lombok
+
+| Kotlin  | Lombok |
+| ------------- | ------------- |
+| New language (syntax) to learn  | New language to learn  |
+| Needs build plugin  | Needs build plugin  |
+| Good IDE support  | Good IDE support  |
+| 15 minutes 30 secs to learn<!-- .element: class="fragment" --> | 15 minutes 7 seconds to learn<!-- .element: class="fragment" -->| 
+| Nice syntax<!-- .element: class="fragment" --> | Cancer<!-- .element: class="fragment" --> |
+
+
+
+# Summary
+
+
+
+Eliminated magic
+
+
+Practically eliminated mutability
+
+
+Functional programming of server supported by syntax
+
+
+Accepted
+
+
+![steps](/src/img/giant_steps.jpg)
+
+
+
